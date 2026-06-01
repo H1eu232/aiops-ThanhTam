@@ -37,7 +37,7 @@ Biểu đồ dưới đây thể hiện sự khác biệt rõ rệt giữa hai p
 - **Trên:** Detector 1 (Statistical - Z-Score) phát hiện quá nhiều điểm bất thường, gây báo động giả
 - **Dưới:** Detector 2 (Isolation Forest) chính xác hơn, tập trung vào các bất thường thực sự
 
-![Anomaly Detection Comparison](./anomaly_detection_plot.png)
+![Anomaly Detection Comparison](./images/anomaly_detection_plot.png)
 
 ---
 
@@ -46,22 +46,13 @@ Biểu đồ dưới đây thể hiện sự khác biệt rõ rệt giữa hai p
 ### File Mô Hình Đã Huấn Luyện
 
 **Tên file:** `isolation_forest_model.joblib`
-- **Dung lượng:** < 1 MB (nhỏ gọn, tối ưu cho production deployment)
-- **Format:** Joblib binary (dễ load và deploy)
+- **Dung lượng:** < 1 MB 
+- **Format:** Joblib binary
 - **Cấu hình mô hình:**
   - Algorithm: Isolation Forest
   - n_estimators: 200
   - contamination: 0.02 (tuned)
   - random_state: 42 (reproducibility)
-
-**Hướng dùng:**
-```python
-import joblib
-model = joblib.load('isolation_forest_model.joblib')
-predictions = model.predict(X_new)
-```
-
-File mô hình này đã sẵn sàng để deploy vào môi trường production và sử dụng cho việc phát hiện bất thường real-time trên các metric từ Prometheus.
 
 ---
 
@@ -70,8 +61,8 @@ File mô hình này đã sẵn sàng để deploy vào môi trường production
 Dựa trên quá trình khảo sát EDA (Phase 1) đối với tập dữ liệu `cpu_utilization_asg_misconfiguration.csv`:
 
 * **Loại dữ liệu:** Đây là chuỗi thời gian đơn biến (Univariate Time Series) ghi nhận số liệu phân phối với tần suất 5 phút/lần. 
-* **Tính chu kỳ (Stationarity & Seasonality):** Đồ thị ACF chỉ ra dữ liệu có tính chu kỳ hằng ngày rất rõ rệt (Daily Pattern), tương ứng với `period = 288` điểm dữ liệu cho mỗi vòng chu kỳ 24 giờ.
-* **Độ lệch (Skewness):** Phân phối dữ liệu CPU có chỉ số Skewness cao (> 1.0), lệch nặng về phía bên phải (Right-Skewed) do xuất hiện các cụm điểm đột biến và hành vi Misconfiguration hệ thống kéo dài làm bung rộng đuôi phân phối.
+* **Stationarity & Seasonality:** Đồ thị ACF chỉ ra dữ liệu có tính chu kỳ hằng ngày rất rõ rệt, tương ứng với `period = 288` điểm dữ liệu cho mỗi vòng chu kỳ 24 giờ.
+* **Skewness:** Phân phối dữ liệu CPU có chỉ số Skewness cao (> 1.0), lệch nặng về phía bên phải (Right-Skewed) do xuất hiện các cụm điểm đột biến và hành vi Misconfiguration hệ thống kéo dài làm bung rộng đuôi phân phối.
 
 ---
 
@@ -96,5 +87,3 @@ Nếu là kỹ sư chịu trách nhiệm vận hành hệ thống AIOps trên m�
 3. **Tính tối ưu tài nguyên:** Isolation Forest có độ phức tạp thuật toán thấp O(n\logn), dung lượng file artifact xuất ra rất nhỏ gọn (< 1MB), hoàn toàn đáp ứng được bài toán chấm điểm real-time luồng metric truyền về liên tục từ Prometheus.
 
 ---
-**Người thực hiện bài tập:** [Điền tên của bạn vào đây]
-**Repo:** aiops-w1/w1-d1
