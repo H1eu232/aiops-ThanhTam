@@ -9,11 +9,11 @@ Lớp: **AIOps - Week 1 - Day B**
 
 Dưới đây là các biểu đồ phân tích chuỗi thời gian hoạt động của log và kết quả so sánh giữa các thuật toán phát hiện bất thường:
 
-### 📈 Hoạt động của Template theo thời gian (Template Activity Time Series)
+### Hoạt động của Template theo thời gian (Template Activity Time Series)
 ![Template Timeseries](results/template_timeseries.png)
 *Biểu đồ hiển thị tần suất của các template theo chuỗi thời gian 5 phút và đánh dấu các điểm bất thường dựa trên quy tắc 3-Sigma.*
 
-### 🚨 So sánh kết quả phát hiện bất thường (Anomaly Detection Comparison)
+### So sánh kết quả phát hiện bất thường (Anomaly Detection Comparison)
 ![Anomaly Detection Comparison](results/anomaly_detection_comparison.png)
 *Biểu đồ so sánh kết quả dự báo điểm bất thường của quy tắc 3-Sigma (3-Sigma Rule) và thuật toán Rừng cô lập (Isolation Forest) so với nhãn chuẩn gốc (Ground Truth).*
 
@@ -21,7 +21,7 @@ Dưới đây là các biểu đồ phân tích chuỗi thời gian hoạt độ
 
 ## 2. Logs & Kết quả kiểm nghiệm Drain3
 
-### 📋 Kết quả phân tích HDFS Dataset (2,000 dòng log)
+### Kết quả phân tích HDFS Dataset (2,000 dòng log)
 * **Tổng số dòng log:** 2,000
 * **Số lượng templates duy nhất:** 17
 
@@ -46,20 +46,20 @@ Quy trình thử nghiệm với các ngưỡng tương đồng (`drain_sim_th`) 
 | **0.5** | 17 | Tốt (mức cân bằng tối ưu giữa gom cụm và giữ thông tin) |
 | **0.7** | 700 | Kém (quá phân mảnh, sinh ra nhiều template trùng lặp cấu trúc) |
 
-👉 **Lựa chọn:** Chọn ngưỡng **0.5** làm giá trị tốt nhất để đảm bảo mô hình phân tích log có độ tổng quát hóa tốt nhất mà không làm mất thông tin quan trọng.
+**Lựa chọn:** Chọn ngưỡng **0.5** làm giá trị tốt nhất để đảm bảo mô hình phân tích log có độ tổng quát hóa tốt nhất mà không làm mất thông tin quan trọng.
 
 ---
 
 ## 3. Reflection (Nhận xét & Đánh giá bản thân)
 
-### 🤔 Drain3 phân tích tốt không?
+### Drain3 phân tích tốt không?
 * **Đánh giá:** Drain3 hoạt động cực kỳ hiệu quả và nhanh chóng. Thuật toán này có khả năng xử lý log theo thời gian thực (online parsing) rất tốt. Nó tự động phát hiện được các tham số động (như Block ID, IP, dung lượng file, thời gian) và thay thế bằng ký tự đại diện `<*>` một cách chuẩn xác, giúp giảm chiều dữ liệu từ hàng ngàn log không cấu trúc về dạng có cấu trúc.
 
-### 💡 Những templates mang lại insight quan trọng
+### Những templates mang lại insight quan trọng
 * **Template ID 9 (`<*>/<*> exception while serving <*> to <*>`):** Đây là template quan trọng nhất để phát hiện lỗi hệ thống. Nó phản ánh trực tiếp việc các nút dữ liệu gặp ngoại lệ khi đang phục vụ block thông tin cho client.
 * **Template ID 10 (`BLOCK* NameSystem.delete: <*> is added to invalidSet...`):** Cung cấp insight về các tác vụ dọn dẹp bộ nhớ hoặc giải phóng các block dữ liệu không hợp lệ (hỗ trợ phân tích quản lý vòng đời dữ liệu).
 
-### 🔄 Phân biệt Metrics và Logs trong AIOps
+### Phân biệt Metrics và Logs trong AIOps
 * **Logs (Nhật ký sự kiện):**
   * *Bản chất:* Là dữ liệu định tính, rời rạc (discrete). Mỗi dòng log là một bản ghi chi tiết về một sự kiện cụ thể xảy ra trong hệ thống tại một thời điểm (ví dụ: lỗi kết nối, cập nhật DB, exception).
   * *Ưu điểm:* Chứa ngữ cảnh cực kỳ chi tiết (stack trace, thông báo lỗi cụ thể) giúp kỹ sư tìm ra **nguyên nhân gốc rễ (root cause)** của sự cố.
