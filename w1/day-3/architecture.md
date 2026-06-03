@@ -4,60 +4,9 @@ This document describes the End-to-End (E2E) telemetry and anomaly detection arc
 
 ---
 
-## 1. End-to-End Data Flow Diagram (Mermaid)
+## 1. End-to-End Data Flow Diagram 
 
-```mermaid
-graph TD
-    %% Service Layer
-    subgraph Service Layer
-        PS[Payment Microservice - Go] -->|OTel Traces & Metrics| OC[OpenTelemetry SDK]
-        AS[Authentication Service - Python] -->|OTel Traces & Metrics| OC
-    end
-
-    %% Collection Layer
-    subgraph Collection Layer
-        OC -->|gRPC / OTLP| OTC[OpenTelemetry Collector]
-    end
-
-    %% Transport Layer
-    subgraph Transport Layer
-        OTC -->|Publish Logs & Traces| K_LT[Kafka Topic: payment.logs-traces]
-        OTC -->|Publish Metrics| K_M[Kafka Topic: payment.metrics]
-    end
-
-    %% Processing Layer
-    subgraph Processing Layer
-        K_M -->|Stream Consumption| Flink[Apache Flink - Rolling Stats & Rate of Change]
-        K_LT -->|Buffer Ingestion| Logstash[Logstash/Fluentbit]
-    end
-
-    %% Storage Layer
-    subgraph Storage Layer
-        Flink -->|Write Enriched Metrics| VM[(VictoriaMetrics - Time Series)]
-        Logstash -->|Index Logs/Traces| ES[(Elasticsearch Cluster)]
-    end
-
-    %% Query & Machine Learning Layer
-    subgraph Query & ML Alerting Layer
-        Grafana[Grafana Dashboard] -->|PromQL Queries| VM
-        Grafana -->|Lucene Queries| ES
-        ML_Engine[Python ML Anomaly Engine] -->|Pull Metric Vectors| VM
-        ML_Engine -->|Run Isolation Forest| Alert[PagerDuty / Slack Alert]
-    end
-
-    %% Styles
-    classDef service fill:#f9f,stroke:#333,stroke-width:2px;
-    classDef transport fill:#bbf,stroke:#333,stroke-width:2px;
-    classDef processing fill:#bfb,stroke:#333,stroke-width:2px;
-    classDef storage fill:#ffb,stroke:#333,stroke-width:2px;
-    classDef ui fill:#fbb,stroke:#333,stroke-width:2px;
-
-    class PS,AS service;
-    class K_LT,K_M transport;
-    class Flink,Logstash processing;
-    class VM,ES storage;
-    class Grafana,ML_Engine,Alert ui;
-```
+![Data Flow](./E2EDataFlowDiagram.png)
 
 ---
 
