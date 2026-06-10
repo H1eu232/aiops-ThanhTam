@@ -1,0 +1,79 @@
+{
+  "clusters_analyzed": 3,
+  "results": [
+    {
+      "cluster_id": "c-000-000",
+      "graph_top3": [
+        [
+          "payment-svc",
+          1.0
+        ],
+        [
+          "notification-svc",
+          0.9
+        ],
+        [
+          "cart-svc",
+          0.87
+        ]
+      ],
+      "root_cause": "payment-svc",
+      "class": "connection_pool_exhaustion",
+      "confidence": 0.86,
+      "actions": [
+        "Rollback to v3.1. Scale pool 50 → 100 cushion. Add pool monitor alert > 80%."
+      ],
+      "reasoning": "payment-svc ranked first from graph impact and early-alert timing; top historical match INC-2025-11-08 supplied the class and actions.",
+      "similar_incidents": [
+        "INC-2025-11-08",
+        "INC-2026-01-04",
+        "INC-2025-09-05"
+      ],
+      "method": "graph+keyword-knn"
+    },
+    {
+      "cluster_id": "c-000-001",
+      "graph_top3": [
+        [
+          "recommender-svc",
+          0.55
+        ]
+      ],
+      "root_cause": "recommender-svc",
+      "class": "batch_overlap",
+      "confidence": 0.61,
+      "actions": [
+        "Stagger schedule. Move retrain to read replica."
+      ],
+      "reasoning": "recommender-svc ranked first from graph impact and early-alert timing; top historical match INC-2026-03-07 supplied the class and actions.",
+      "similar_incidents": [
+        "INC-2026-03-07",
+        "INC-2025-08-02",
+        "INC-2025-10-28"
+      ],
+      "method": "graph+keyword-knn"
+    },
+    {
+      "cluster_id": "c-000-002",
+      "graph_top3": [
+        [
+          "search-svc",
+          0.55
+        ]
+      ],
+      "root_cause": "search-svc",
+      "class": "n_plus_1",
+      "confidence": 0.61,
+      "actions": [
+        "Batch fetch related products. Add monitoring query count / request."
+      ],
+      "reasoning": "search-svc ranked first from graph impact and early-alert timing; top historical match INC-2026-01-29 supplied the class and actions.",
+      "similar_incidents": [
+        "INC-2026-01-29",
+        "INC-2026-05-25",
+        "INC-2025-09-21"
+      ],
+      "method": "graph+keyword-knn"
+    }
+  ]
+}
