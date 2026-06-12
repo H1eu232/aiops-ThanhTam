@@ -1,0 +1,72 @@
+flowchart LR
+  subgraph APP["GeekShop production - owned by service teams"]
+    S["10 services + 4 stores<br/>OTel SDK / Prometheus endpoints"]
+    AG["OTel Collector agents<br/>DaemonSet; enrich service/team/deploy"]
+    S --> AG
+  end
+
+  subgraph PLATFORM["Observability platform - owned by Platform/SRE"]
+    GW["OTel Gateway cluster<br/>filter PII, cardinality guard,<br/>tail sampling, routing"]
+    VM["Mimir<br/>metrics hot: 30 days"]
+    LK["Loki<br/>logs hot: 7 days"]
+    TP["Tempo<br/>traces hot: 7 days"]
+    S3["AWS S3 managed object storage<br/>metrics: 13 months<br/>logs: 90 days<br/>traces: 30 days"]
+    GF["Grafana OSS<br/>single query, dashboards, SLOs,<br/>service graph + incident view"]
+    AM["Mimir ruler + Alertmanager<br/>inhibit/group by service graph,<br/>severity and fingerprint"]
+    IR["Incident record service<br/>Postgres: timeline/actions/links"]
+    BB["Blackbox exporter<br/>API/TLS synthetic checks"]
+  end
+
+  subgraph SAAS["External SaaS"]
+    PD["PagerDuty<br/>paging + schedules"]
+    SP["Atlassian Statuspage<br/>customer status"]
+  end
+
+  subgraph HUMANS["Human surfaces"]
+    OC["On-call: Grafana first;<br/>PagerDuty only for ack/escalation"]
+    SEC["Security/audit:<br/>Grafana Loki + S3 export"]
+  end
+
+  subgraph LEGEND["Ownership/type legend"]
+    L1["OSS operated by Platform"]
+    L2["External SaaS"]
+    L3["Managed cloud service"]
+    L4["Built in-house"]
+  end
+
+  AG -->|"OTLP metrics/logs/traces"| GW
+  BB -->|"Prometheus metrics"| GW
+  GW -->|"metrics"| VM
+  GW -->|"structured logs; drop/debug sample"| LK
+  GW -->|"100% errors + slow; 5% normal"| TP
+  VM --> S3
+  LK --> S3
+  TP --> S3
+  VM --> GF
+  LK --> GF
+  TP --> GF
+  GF --> IR
+  VM --> AM
+  LK --> AM
+  TP --> AM
+  AM -->|"grouped actionable pages"| PD
+  PD -->|"incident webhook"| IR
+  PD -->|"major incident update"| SP
+  OC --> GF
+  OC --> PD
+  SEC --> GF
+
+  classDef oss fill:#d8f3dc,stroke:#237a3b,color:#111;
+  classDef saas fill:#ffd6a5,stroke:#9c5700,color:#111;
+  classDef managed fill:#e8d7ff,stroke:#6941a5,color:#111;
+  classDef inhouse fill:#cfe8ff,stroke:#245b91,color:#111;
+  classDef human fill:#fff3b0,stroke:#8a7415,color:#111;
+  class AG,GW,VM,LK,TP,GF,AM,BB oss;
+  class PD,SP saas;
+  class S3 managed;
+  class S,IR inhouse;
+  class OC,SEC human;
+  class L1 oss;
+  class L2 saas;
+  class L3 managed;
+  class L4 inhouse;
